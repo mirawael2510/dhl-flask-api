@@ -9,7 +9,8 @@ API_URL = 'https://api.dhlexpresscommerce.com/v1/orders'
 def get_flat_rate_by_country(country_code):
     if country_code == "US":
         return 35
-    elif country_code in ["AL", "AD", "DE", "FR", "IT", "ES"]:
+    elif country_code in ["AL", "AD", "AT", "BY", "BE", "BA", "BG", "HR", "CY", "CZ", "DK", "EE", "FI", "GR", "HU", "IS", "IE", "DE", "FR", "IT", "XK", "LV", "LI", "LT",
+     "LU", "MT", "MD", "MC", "ME", "NL", "MK", "NO", "PL", "PT", "RO", "SM", "RS", "SK", "SI", "ES", "SE", "CH", "UA", "GB", "VA"]:
         return 31
     elif country_code in ["AE", "SA", "KW", "QA", "BH", "OM"]:
         return 28
