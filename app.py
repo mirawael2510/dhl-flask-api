@@ -6,16 +6,34 @@ app = Flask(__name__)
 API_KEY = 'ec21f43bb5ba4bfe8ff933057f361114'
 API_URL = 'https://api.dhlexpresscommerce.com/v1/orders'
 
-def get_flat_rate_by_country(country_code):
+def get_flat_rate_by_country(country_code, total_price):
+    country_code = country_code.upper()
+
+    # USA logic
     if country_code == "US":
+        if total_price >= 500:
+            return 0  # Free shipping
         return 35
+
+    # Europe zone
     elif country_code in ["AL", "AD", "AT", "BY", "BE", "BA", "BG", "HR", "CY", "CZ", "DK", "EE", "FI", "GR", "HU", "IS", "IE", "DE", "FR", "IT", "XK", "LV", "LI", "LT",
-     "LU", "MT", "MD", "MC", "ME", "NL", "MK", "NO", "PL", "PT", "RO", "SM", "RS", "SK", "SI", "ES", "SE", "CH", "UA", "GB", "VA"]:
+                          "LU", "MT", "MD", "MC", "ME", "NL", "MK", "NO", "PL", "PT", "RO", "SM", "RS", "SK", "SI", "ES", "SE", "CH", "UA", "GB", "VA"]:
+        if total_price >= 500:
+            return 0  # Discounted for Europe
         return 31
+
+    # Gulf countries
     elif country_code in ["AE", "SA", "KW", "QA", "BH", "OM"]:
+        if total_price >= 500:
+            return 0
         return 28
+
+    # Rest of world
     else:
+        if total_price >= 500:
+            return 70
         return 45
+
 
 @app.route('/receive_order', methods=['POST'])
 def receive_order():
@@ -23,7 +41,10 @@ def receive_order():
 
     try:
         shipping = data["shipping_address"]
-        flat_rate = get_flat_rate_by_country(shipping["country_code"])
+        total_price = float(data.get("total_price", 0))
+        flat_rate = get_flat_rate_by_country(shipping["country_code"], total_price)
+        
+        print(f"Received order #{data['order_number']} from {shipping['country_code']} — Total: ${total_price}, Rate: ${flat_rate}")
 
         payload = {
             "orderNumber": data["order_number"],
